@@ -22,23 +22,22 @@ public class Scrapper extends ScrapperSettings {
 
     private final String LINK = "https://github.com/allegro";
 
-//    TODO
+    //    TODO
     private List<String> collectLinks(String githubHomeLink) {
         List<String> links = new ArrayList<>();
         return links;
     }
 
-    private Elements collectElements(String githubLink) throws Exception {
+    protected Elements collectElements(String githubLink) throws Exception {
         Document document = connectWith(githubLink);
         Elements elements = document.select("ul>li[itemprop = owns]");
         return elements;
     }
 
-    //    TODO
+    //    TODO - linki 1,2,3
     public void collectData() throws Exception {
         Elements elements = collectElements(LINK);
-        for (Element element : elements
-        ) {
+        for (Element element : elements) {
             AllegroProject allegroProject = downloadProjectData(element);
             allegroProjectService.save(allegroProject);
             System.out.println(allegroProject);
@@ -46,18 +45,55 @@ public class Scrapper extends ScrapperSettings {
     }
 
     //  TODO
-    public AllegroProject downloadProjectData(Element element) {
+    protected AllegroProject downloadProjectData(Element element) {
         AllegroProject allegroProject = new AllegroProject();
         allegroProject.setTitle(searchForTitle(element));
-//        allegroProject.setDescription(searchForDescription(element));
-//        allegroProject.setDatetime(searchForDateTime(element));
+        allegroProject.setDescription(searchForDescription(element));
+        allegroProject.setProgrammingLanguage(searchForProgrammingLanguage(element));
+        allegroProject.setStar(searchForStar(element));
+        allegroProject.setFork(searchForFork(element));
+        allegroProject.setLink(searchForLink(element));
+        allegroProject.setTopicList(searchForTopicList(element));
         allegroProject.setDatetime(searchForDateTime(element));
         return allegroProject;
     }
 
+    //    TODO
+    protected List<String> searchForTopicList(Element element) {
+        List<String> topicList = new ArrayList<>();
+        return topicList;
+    }
 
-    //   2019-04-11T08:55:57Z
-    public Date searchForDateTime(Element element) {
+
+    protected String searchForLink(Element element) {
+        String link = element
+                .select("[itemprop=name codeRepository]")
+                .attr("abs:href");
+        return link;
+    }
+
+    //    TODO
+    protected int searchForFork(Element element) {
+        int fork = 0;
+        return fork;
+    }
+
+    //    TODO - svg
+    protected int searchForStar(Element element) {
+        int star = Integer.parseInt(element
+                .getElementsByClass("octicon.octicon-star")
+                .text());
+        return star;
+    }
+
+    protected String searchForProgrammingLanguage(Element element) {
+        String programmingLanguage = element.select("[itemprop=programmingLanguage]").text();
+        return programmingLanguage;
+    }
+
+
+    //  Date sample: 2019-04-11T08:55:57Z
+    protected Date searchForDateTime(Element element) {
         String dateText = element
                 .select("[datetime]")
                 .attr("datetime");
@@ -70,14 +106,14 @@ public class Scrapper extends ScrapperSettings {
         return dateTime;
     }
 
-    // TODO
-    public String searchForDescription(Element element) {
-        String description = element.select("").text();
+
+    protected String searchForDescription(Element element) {
+        String description = element.select("[itemprop=description]").text();
         return description;
 
     }
 
-    public String searchForTitle(Element element) {
+    protected String searchForTitle(Element element) {
         String title = element.select("h3.wb-break-all").text();
         return title;
     }
