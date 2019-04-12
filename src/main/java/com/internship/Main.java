@@ -20,5 +20,6 @@ public class Main implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         scrapper.collectData();
+
     }
 }
