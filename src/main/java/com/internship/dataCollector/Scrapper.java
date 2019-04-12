@@ -25,6 +25,9 @@ public class Scrapper extends ScrapperSettings {
     //    TODO
     private List<String> collectLinks(String githubHomeLink) {
         List<String> links = new ArrayList<>();
+        links.add("https://github.com/allegro");
+        links.add("https://github.com/allegro?page=2");
+        links.add("https://github.com/allegro?page=3");
         return links;
     }
 
@@ -34,17 +37,18 @@ public class Scrapper extends ScrapperSettings {
         return elements;
     }
 
-    //    TODO - linki 1,2,3
     public void collectData() throws Exception {
-        Elements elements = collectElements(LINK);
-        for (Element element : elements) {
-            AllegroProject allegroProject = downloadProjectData(element);
-            allegroProjectService.save(allegroProject);
-            System.out.println(allegroProject);
+        List<String> paginationList = collectLinks(LINK);
+        for (int i = 0; i < paginationList.size(); i++) {
+            Elements elements = collectElements(paginationList.get(i));
+            for (Element element : elements) {
+                AllegroProject allegroProject = downloadProjectData(element);
+                allegroProjectService.save(allegroProject);
+                System.out.println(allegroProject);
+            }
         }
     }
 
-    //  TODO
     protected AllegroProject downloadProjectData(Element element) {
         AllegroProject allegroProject = new AllegroProject();
         allegroProject.setTitle(searchForTitle(element));
@@ -58,9 +62,14 @@ public class Scrapper extends ScrapperSettings {
         return allegroProject;
     }
 
-    //    TODO
     protected List<String> searchForTopicList(Element element) {
         List<String> topicList = new ArrayList<>();
+        String topic = element.select("a.topic-tag").text();
+        String[] parts = topic.split(" ");
+        for (int i = 0; i < parts.length; i++) {
+            String item = parts[i];
+            topicList.add(item);
+        }
         return topicList;
     }
 
@@ -72,22 +81,30 @@ public class Scrapper extends ScrapperSettings {
         return link;
     }
 
-    //    TODO
-    protected int searchForFork(Element element) {
-        int fork = 0;
+
+    protected String searchForFork(Element element) {
+        String fork = element
+                .select("[href=/allegro/"
+                        + searchForTitle(element)
+                        + "/network]")
+                .text();
         return fork;
     }
 
-    //    TODO - svg
-    protected int searchForStar(Element element) {
-        int star = Integer.parseInt(element
-                .getElementsByClass("octicon.octicon-star")
-                .text());
+
+    protected String searchForStar(Element element) {
+        String star = element
+                .select("[href=/allegro/"
+                        + searchForTitle(element)
+                        + "/stargazers]")
+                .text();
         return star;
     }
 
     protected String searchForProgrammingLanguage(Element element) {
-        String programmingLanguage = element.select("[itemprop=programmingLanguage]").text();
+        String programmingLanguage = element
+                .select("[itemprop=programmingLanguage]")
+                .text();
         return programmingLanguage;
     }
 
@@ -99,7 +116,8 @@ public class Scrapper extends ScrapperSettings {
                 .attr("datetime");
         Date dateTime = null;
         try {
-            dateTime = new SimpleDateFormat(DATE_FORMAT_PATTERN).parse(dateText);
+            dateTime = new SimpleDateFormat(DATE_FORMAT_PATTERN)
+                    .parse(dateText);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -108,13 +126,17 @@ public class Scrapper extends ScrapperSettings {
 
 
     protected String searchForDescription(Element element) {
-        String description = element.select("[itemprop=description]").text();
+        String description = element
+                .select("[itemprop=description]")
+                .text();
         return description;
 
     }
 
     protected String searchForTitle(Element element) {
-        String title = element.select("h3.wb-break-all").text();
+        String title = element
+                .select("h3.wb-break-all")
+                .text();
         return title;
     }
 

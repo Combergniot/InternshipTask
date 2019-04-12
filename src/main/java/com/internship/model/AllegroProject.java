@@ -22,8 +22,8 @@ public class AllegroProject {
     private List<String> topicList;
 
     private String programmingLanguage;
-    private int star;
-    private int fork;
+    private String star;
+    private String fork;
     private Date datetime;
 
     public AllegroProject() {
@@ -77,19 +77,19 @@ public class AllegroProject {
         this.programmingLanguage = programmingLanguage;
     }
 
-    public int getStar() {
+    public String getStar() {
         return star;
     }
 
-    public void setStar(int star) {
+    public void setStar(String star) {
         this.star = star;
     }
 
-    public int getFork() {
+    public String getFork() {
         return fork;
     }
 
-    public void setFork(int fork) {
+    public void setFork(String fork) {
         this.fork = fork;
     }
 
