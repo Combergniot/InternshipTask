@@ -5,9 +5,12 @@ import com.internship.services.AllegroProjectService;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,14 +23,25 @@ public class Scrapper extends ScrapperSettings {
     @Autowired
     AllegroProjectService allegroProjectService;
 
+    private static final Logger log = LoggerFactory.getLogger(Scrapper.class);
+
     private final String LINK = "https://github.com/allegro";
 
-    //    TODO
-    private List<String> collectLinks(String githubHomeLink) {
+    protected int findLastPaginationNumber() throws IOException {
+        Document document = connectWith(LINK);
+        String element = document.select("div.pagination>a")
+                .prev()
+                .last()
+                .text();
+        int lastPaginationNumber = Integer.valueOf(element);
+        return lastPaginationNumber;
+    }
+
+    protected List<String> collectLinks() throws IOException {
         List<String> links = new ArrayList<>();
-        links.add("https://github.com/allegro");
-        links.add("https://github.com/allegro?page=2");
-        links.add("https://github.com/allegro?page=3");
+        for (int i = 1; i <=findLastPaginationNumber() ; i++) {
+            links.add("https://github.com/allegro?page=" +i);
+        }
         return links;
     }
 
@@ -38,15 +52,16 @@ public class Scrapper extends ScrapperSettings {
     }
 
     public void collectData() throws Exception {
-        List<String> paginationList = collectLinks(LINK);
+        List<String> paginationList = collectLinks();
         for (int i = 0; i < paginationList.size(); i++) {
             Elements elements = collectElements(paginationList.get(i));
             for (Element element : elements) {
                 AllegroProject allegroProject = downloadProjectData(element);
                 allegroProjectService.save(allegroProject);
-                System.out.println(allegroProject);
+//                System.out.println(allegroProject);
             }
         }
+        log.info("All data were collected!");
     }
 
     protected AllegroProject downloadProjectData(Element element) {
@@ -107,7 +122,6 @@ public class Scrapper extends ScrapperSettings {
                 .text();
         return programmingLanguage;
     }
-
 
     //  Date sample: 2019-04-11T08:55:57Z
     protected Date searchForDateTime(Element element) {

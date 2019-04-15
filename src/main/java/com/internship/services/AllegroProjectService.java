@@ -4,6 +4,9 @@ import com.internship.model.AllegroProject;
 import com.internship.repositories.AllegroProjectRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class AllegroProjectService {
 
@@ -19,6 +22,15 @@ public class AllegroProjectService {
 
     public AllegroProject save(AllegroProject allegroProject) {
         return allegroProjectRepository.save(allegroProject);
+    }
+
+    public void saveAll(List<AllegroProject> allegroProjectList) {
+        allegroProjectRepository.saveAll(allegroProjectList);
+    }
+
+    public Optional<AllegroProject> findById(Long id) {
+        Optional<AllegroProject> allegroProject = allegroProjectRepository.findById(id);
+        return allegroProject;
     }
 
 }

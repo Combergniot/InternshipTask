@@ -5,11 +5,27 @@ import org.jsoup.select.Elements;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
+
 public class ScrapperTest extends ScrapperSettings {
 
     Scrapper scrapper = new Scrapper();
 
     private String githubLink = "https://github.com/allegro";
+
+    @Test
+    public void shouldSayThatLastPaginationNumberIsEqual_3() throws Exception {
+        Assert.assertEquals(3, scrapper.findLastPaginationNumber());
+    }
+
+    @Test
+    public void shouldThatComparedLinksAreEquals() throws Exception {
+        List<String> links = scrapper.collectLinks();
+        System.out.println(links);
+        Assert.assertEquals("https://github.com/allegro?page=" +
+                        scrapper.findLastPaginationNumber(),
+                links.get(links.size()-1));
+    }
 
     @Test
     public void shouldSayThatDataTimeIsNotNull() throws Exception {
