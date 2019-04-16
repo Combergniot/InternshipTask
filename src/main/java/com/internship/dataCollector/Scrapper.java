@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @Component
 public class Scrapper extends ScrapperSettings {
@@ -39,8 +40,8 @@ public class Scrapper extends ScrapperSettings {
 
     protected List<String> collectLinks() throws IOException {
         List<String> links = new ArrayList<>();
-        for (int i = 1; i <=findLastPaginationNumber() ; i++) {
-            links.add("https://github.com/allegro?page=" +i);
+        for (int i = 1; i <= findLastPaginationNumber(); i++) {
+            links.add("https://github.com/allegro?page=" + i);
         }
         return links;
     }
@@ -130,8 +131,10 @@ public class Scrapper extends ScrapperSettings {
                 .attr("datetime");
         Date dateTime = null;
         try {
-            dateTime = new SimpleDateFormat(DATE_FORMAT_PATTERN)
-                    .parse(dateText);
+            SimpleDateFormat simpleDateFormat =
+                    new SimpleDateFormat(DATE_FORMAT_PATTERN);
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            dateTime = simpleDateFormat.parse(dateText);
         } catch (ParseException e) {
             e.printStackTrace();
         }

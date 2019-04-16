@@ -4,8 +4,6 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-
-
 @Entity
 public class AllegroProject {
 
@@ -18,7 +16,7 @@ public class AllegroProject {
     private String link;
 
     @Column
-    @ElementCollection(targetClass=String.class)
+    @ElementCollection(targetClass=String.class, fetch = FetchType.EAGER)
     private List<String> topicList;
 
     private String programmingLanguage;

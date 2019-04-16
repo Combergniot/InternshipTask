@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface AllegroProjectRepository extends CrudRepository<AllegroProject, Long> {
 
     Optional<AllegroProject> findById(Long id);
+
+
 }
