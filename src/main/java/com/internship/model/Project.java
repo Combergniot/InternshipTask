@@ -5,13 +5,15 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-public class AllegroProject {
+public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String title;
+
+    @Lob
     private String description;
     private String link;
 
@@ -24,7 +26,7 @@ public class AllegroProject {
     private String fork;
     private Date datetime;
 
-    public AllegroProject() {
+    public Project() {
     }
 
     public Long getId() {
@@ -101,7 +103,7 @@ public class AllegroProject {
 
     @Override
     public String toString() {
-        return "AllegroProject{" +
+        return "Project{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +

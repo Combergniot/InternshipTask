@@ -13,18 +13,19 @@ public class ScrapperTest extends ScrapperSettings {
 
     private String githubLink = "https://github.com/allegro";
 
+    /*check the last pagination number on site, and than set expected value*/
     @Test
     public void shouldSayThatLastPaginationNumberIsEqual_3() throws Exception {
-        Assert.assertEquals(3, scrapper.findLastPaginationNumber());
+        System.out.println(scrapper.findLastPaginationNumber(githubLink));
+        Assert.assertEquals(3, scrapper.findLastPaginationNumber(githubLink));
     }
 
     @Test
     public void shouldThatComparedLinksAreEquals() throws Exception {
-        List<String> links = scrapper.collectLinks();
-        System.out.println(links);
-        Assert.assertEquals("https://github.com/allegro?page=" +
-                        scrapper.findLastPaginationNumber(),
-                links.get(links.size()-1));
+        List<String> links = scrapper.collectLinks(githubLink);
+        Assert.assertEquals(githubLink + "?page=" +
+                        scrapper.findLastPaginationNumber(githubLink),
+                links.get(links.size() - 1));
     }
 
     @Test

@@ -12,15 +12,15 @@ public abstract class ScrapperSettings {
                     "AppleWebKit/537.36 (KHTML, like Gecko) " +
                     "Chrome/45.0.2454.101 Safari/537.36";
     protected static final String REFERRER = "http://www.google.com";
-    protected static final String PROXY_HOST = "webproxy.stat.intra";
-    protected static final int PROXY_PORT = 8080;
+//    protected static final String PROXY_HOST = "";
+//    protected static final int PROXY_PORT = 8080;
     protected static final int TIMEOUT = 10 * 1000;
 
     protected final static String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     protected Document connectWith(String link) throws IOException {
         Document document = Jsoup.connect(link)
-                .proxy(PROXY_HOST, PROXY_PORT)
+//                .proxy(PROXY_HOST, PROXY_PORT)
                 .userAgent(USER_AGENT)
                 .referrer(REFERRER)
                 .timeout(TIMEOUT)

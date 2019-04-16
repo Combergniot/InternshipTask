@@ -1,7 +1,7 @@
 package com.internship.dataCollector;
 
-import com.internship.model.AllegroProject;
-import com.internship.services.AllegroProjectService;
+import com.internship.model.Project;
+import com.internship.services.ProjectService;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -22,14 +22,12 @@ import java.util.TimeZone;
 public class Scrapper extends ScrapperSettings {
 
     @Autowired
-    AllegroProjectService allegroProjectService;
+    ProjectService projectService;
 
     private static final Logger log = LoggerFactory.getLogger(Scrapper.class);
 
-    private final String LINK = "https://github.com/allegro";
-
-    protected int findLastPaginationNumber() throws IOException {
-        Document document = connectWith(LINK);
+    protected int findLastPaginationNumber(String githubLink) throws IOException {
+        Document document = connectWith(githubLink);
         String element = document.select("div.pagination>a")
                 .prev()
                 .last()
@@ -38,11 +36,13 @@ public class Scrapper extends ScrapperSettings {
         return lastPaginationNumber;
     }
 
-    protected List<String> collectLinks() throws IOException {
+    protected List<String> collectLinks(String githubLink) throws IOException {
         List<String> links = new ArrayList<>();
-        for (int i = 1; i <= findLastPaginationNumber(); i++) {
-            links.add("https://github.com/allegro?page=" + i);
+        int lastPaginationNumber = findLastPaginationNumber(githubLink);
+        for (int i = 1; i <= lastPaginationNumber; i++) {
+            links.add(githubLink + "?page=" + i);
         }
+        log.info("The list of links has been created!");
         return links;
     }
 
@@ -52,30 +52,29 @@ public class Scrapper extends ScrapperSettings {
         return elements;
     }
 
-    public void collectData() throws Exception {
-        List<String> paginationList = collectLinks();
+    public void collectData(String githubLink) throws Exception {
+        List<String> paginationList = collectLinks(githubLink);
         for (int i = 0; i < paginationList.size(); i++) {
             Elements elements = collectElements(paginationList.get(i));
             for (Element element : elements) {
-                AllegroProject allegroProject = downloadProjectData(element);
-                allegroProjectService.save(allegroProject);
-//                System.out.println(allegroProject);
+                Project project = downloadProjectData(element);
+                projectService.save(project);
             }
         }
         log.info("All data were collected!");
     }
 
-    protected AllegroProject downloadProjectData(Element element) {
-        AllegroProject allegroProject = new AllegroProject();
-        allegroProject.setTitle(searchForTitle(element));
-        allegroProject.setDescription(searchForDescription(element));
-        allegroProject.setProgrammingLanguage(searchForProgrammingLanguage(element));
-        allegroProject.setStar(searchForStar(element));
-        allegroProject.setFork(searchForFork(element));
-        allegroProject.setLink(searchForLink(element));
-        allegroProject.setTopicList(searchForTopicList(element));
-        allegroProject.setDatetime(searchForDateTime(element));
-        return allegroProject;
+    protected Project downloadProjectData(Element element) {
+        Project project = new Project();
+        project.setTitle(searchForTitle(element));
+        project.setDescription(searchForDescription(element));
+        project.setProgrammingLanguage(searchForProgrammingLanguage(element));
+        project.setStar(searchForStar(element));
+        project.setFork(searchForFork(element));
+        project.setLink(searchForLink(element));
+        project.setTopicList(searchForTopicList(element));
+        project.setDatetime(searchForDateTime(element));
+        return project;
     }
 
     protected List<String> searchForTopicList(Element element) {
@@ -117,6 +116,7 @@ public class Scrapper extends ScrapperSettings {
         return star;
     }
 
+    //    consider save toLowerCase()
     protected String searchForProgrammingLanguage(Element element) {
         String programmingLanguage = element
                 .select("[itemprop=programmingLanguage]")
